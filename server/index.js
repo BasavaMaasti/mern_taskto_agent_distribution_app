@@ -11,7 +11,12 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// ✅ Allow Vercel domain for CORS
+app.use(cors({
+  origin: ["https://your-vercel-project-name.vercel.app"], // Replace with actual Vercel URL
+  credentials: true,
+}));
+
 app.use(express.json());
 
 // MongoDB connection
@@ -25,6 +30,11 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use('/api/auth', authRoutes);
 app.use('/api/agents', agentRoutes);
 app.use('/api/upload', uploadRoutes);
+
+// ✅ Optional root route
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
