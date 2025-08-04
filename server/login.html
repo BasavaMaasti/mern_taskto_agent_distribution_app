@@ -1,0 +1,42 @@
+<!-- login.html -->
+<form id="login-form">
+  <input type="email"  id="email"    placeholder="Email"    required />
+  <input type="password" id="password" placeholder="Password" required />
+  <button type="submit">Log In</button>
+</form>
+
+<script>
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email    = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    /* ① Check the HTTP status */
+    if (!res.ok) {
+      const { message } = await res.json();
+      throw new Error(message || `Login failed (status ${res.status})`);
+    }
+
+    /* ② Parse the JSON response */
+    const { token, user } = await res.json();
+
+    /* ③ Store the token */
+    localStorage.setItem('token', token);           // or sessionStorage
+
+    /* ④ Optionally store user info */
+    localStorage.setItem('user', JSON.stringify(user));
+
+    /* ⑤ Redirect or update UI */
+    window.location.href = '/dashboard.html';       // example redirect
+  } catch (err) {
+    alert(err.message);                             // simple error pop-up
+  }
+});
+</script>
